@@ -20,4 +20,4 @@ services:
 networks:
   monitoring:
     external: true
-    name: grafana-monitoring_default
+    name: grafana-monitoring_grafana-monitoring

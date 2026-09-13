@@ -1,0 +1,23 @@
+# Deploy compose файл — изпълнява се от self-hosted runner-а
+# на твоя Ubuntu хост, не от GitHub-хоствания CI runner.
+#
+# ВАЖНО: смени `name:` под networks с реалното име на мрежата
+# на твоя Grafana-Monitoring stack. Провери с:
+#   docker network ls
+# обикновено е "<папка-на-compose>_default" или изрично зададено
+# в неговия docker-compose.yml.
+
+services:
+  homelab-status-app:
+    build: .
+    container_name: homelab-status-app
+    ports:
+      - "8088:8088"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+    name: grafana-monitoring_default

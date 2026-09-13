@@ -1,0 +1,8 @@
+# Добави този job под съществуващия `scrape_configs:` в твоя
+# prometheus.yml (при /home/toni/JimsGarage/Grafana-Monitoring/).
+# После, както знаеш от преди — промяна в prometheus.yml изисква:
+#   docker compose up -d --force-recreate prometheus
+
+  - job_name: 'homelab-status-app'
+    static_configs:
+      - targets: ['homelab-status-app:8088']

@@ -1,0 +1,48 @@
+name: CI/CD - homelab-status-app
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout код
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Инсталирай зависимости
+        run: pip install -r requirements.txt
+
+      - name: Тестове
+        run: pytest -q
+
+      - name: Провери, че Docker image-ът се build-ва
+        run: docker build -t homelab-status-app:${{ github.sha }} .
+
+  deploy:
+    name: Deploy в home lab
+    needs: ci
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout код
+        uses: actions/checkout@v4
+
+      - name: Build & deploy с Docker Compose
+        run: |
+          docker compose -f docker-compose.deploy.yml build
+          docker compose -f docker-compose.deploy.yml up -d
+
+      - name: Health check след deploy
+        run: |
+          sleep 5
+          curl -f http://localhost:8088/health
